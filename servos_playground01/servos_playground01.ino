@@ -87,6 +87,7 @@
       delay(1000);
 
       //insert allginment here if you don't want the eyes to face left whilst doing the next movement
+      //troll
 
       //slowly yaw vertically from top to bottom
       //RE needs to be increased
