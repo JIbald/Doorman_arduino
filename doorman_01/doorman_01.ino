@@ -1,128 +1,177 @@
-/// The Doorman ///
-/// Note: there's a led option included///
+//Johannes Ibald Doorman
 
-////
-    #include <Servo.h>
+#include <Servo.h>
+
+//(S)RE : (Servo) right eye
+//(S)LE : (Servo) left eye
+//vertical : vertical movement
+//horizontal : horizontal movement
+  Servo SEyelids;
+  Servo SRE_horizontal;
+  Servo SLE_horizontal;
+  Servo SRE_vertical;
+  Servo SLE_vertical;
+
+//pins for servos
+  const int eyelids = 10;
+  const int RE_horizontal = 5; 
+  const int LE_horizontal = 6;
+  const int RE_vertical = 3;
+  const int LE_vertical = 9; 
+
+// name new position values here for easier use later
+// depending on servo positioning, this can get a little confusing
+// if you're simple minded like me.
+  const int middle = 90;
+  const int right = 65;
+  const int left = 105;
+  const int re_up = 65;
+  const int le_up = 115;
+
+  //used for doing shapes ( see U shape )
+  bool le_passed = false;
+  bool re_passed = false;
+
+//PIR-sensor variables
+  const int PIRsensor = 10;
+  const int LEDpin1 = 8;
     
-    const int servo1 = 3; 
-    const int servo2 = 5; 
-    const int servo3 = 6; 
-    const int servo4 = 9;
-    const int servo5 = 10;  
+void setup()
+{
+  //attach servos
+  SEyelids.attach(eyelids);
+  SRE_horizontal.attach(RE_horizontal);
+  SLE_horizontal.attach(LE_horizontal);
+  SRE_vertical.attach(RE_vertical);
+  SLE_vertical.attach(LE_vertical);
+
+  //set pinModes for PIR and LED
+  pinMode(PIRsensor, INPUT);
+  pinMode(LEDpin1, OUTPUT);
+  
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  int sensorValue = digitalRead(PIRsensor);
+  if( sensorValue == HIGH )
+  { 
+    digitalWrite(LEDpin1, HIGH);
+    Serial.print("MOTION\n");
     
-    int servoVal; 
+    //allign the eyes and eyelids
+    //SEyelids.write(middle);
+    SRE_horizontal.write(middle);
+    SLE_horizontal.write(middle);
+    SRE_vertical.write(middle);
+    SLE_vertical.write(middle);
+  
+    //open eyes
+    SEyelids.write(40);
     
-    Servo myservo1;
-    Servo myservo2;
-    Servo myservo3;
-    Servo myservo4;
-    Servo myservo5;
-    
-////     
-    int ledPin = 13;                // choose the pin for the LED
-    int ledPin2 = 12;
-    int inputPin = 2;               // choose the input pin (for PIR sensor)
-    int pirState = LOW;             // we start, assuming no motion detected
-    int val = 0;                    // variable for reading the pin status
-////     
-    void setup() {
-      
-      myservo1.attach(servo1); 
-      myservo2.attach(servo2);  // attaches the servo
-      myservo3.attach(servo3);  // attaches the servo
-      myservo4.attach(servo4);  // attaches the servo
-      myservo5.attach(servo5);  // attaches the servo
-      
-      pinMode(13, OUTPUT);
-      pinMode(12, OUTPUT);
-      pinMode(ledPin, OUTPUT);      // declare LED as output
-      pinMode(inputPin, INPUT);     // declare sensor as input
-     
-      Serial.begin(9600);
+    delay(500);
+  
+    //look right
+    SRE_horizontal.write(right);
+    SLE_horizontal.write(right);
+  
+    delay(1000);
+  
+    //look left
+    SRE_horizontal.write(left);
+    SLE_horizontal.write(left);
+  
+    delay(1000);
+
+    //look straight and look up
+    SRE_horizontal.write(middle);
+    SLE_horizontal.write(middle);
+    SRE_vertical.write(re_up);
+    SLE_vertical.write(le_up);
+  
+    delay(1000);
+  
+    //slowly yaw horizontally
+    SRE_vertical.write(middle);
+    SLE_vertical.write(middle);
+    for( int i {65}; i <= 120; ++i)
+    {
+      SLE_horizontal.write(i);
+      SRE_horizontal.write(i);
+      delay(100); //this might be too fast/slow
     }
-     
-    void loop(){
 
-/////// ALIGNMENT ///////
+    delay(1000);
+  
+    //insert allginment here if you don't want the eyes to face left whilst doing the next movement
+  
+    //slowly yaw vertically from top to bottom
+    //RE needs to be increased
+    //LE needs to be decreased
+    int j {120};
+    for (int i{55}; i <= 120; ++i)
+    {
+      SRE_vertical.write(i);
+      SLE_vertical.write(j);
+      --j;
+      delay(200);
+    }
 
-         myservo1.write(90);
-         myservo2.write(90);
-         myservo3.write(90);
-         myservo4.write(90);
-         myservo5.write(90);
-         
-
-      delay(1000);
-////
-      /*
-      val = digitalRead(inputPin);  // read input value
-      if (val == HIGH) {            // check if the input is HIGH
-        digitalWrite(ledPin, HIGH);  // turn LED ON
-        if (pirState == LOW) {
-          // we have just turned on
-          Serial.println("Motion detected!");
-          // We only want to print on the output change, not state
-          pirState = HIGH;
-      */
-/////////////// FIRST MOVEMENT /////////
-               
-         myservo1.write(150);  // OPEN EYES
-         delay(2000);          // Wait 5 seconds
-         myservo2.write(75);  // TURN EYE 1 LEFT
-         myservo3.write(75);  // TURN EYE 2 LEFT
-
-         delay(1000); 
-
-////////////// SECOND MOVEMENT //////////
-
-         myservo2.write(105);  // TURN EYE 1 RIGHT
-         myservo3.write(105);  // TURN EYE 2 RIGHT
-
-         delay(1000); 
-
-/////////////// THIRD MOVEMENT /////////
-          
-         myservo2.write(105);  // TURN EYE 1 LEFT
-         myservo3.write(105);  // TURN EYE 2 LEFT
-
-         delay(1000); 
-
-////////////// FOURTH MOVEMENT //////////
-
-         myservo2.write(75);  // TURN EYE 1 RIGHT
-         myservo3.write(75);  // TURN EYE 2 RIGHT
-
-         delay(2000); 
-         
-////////////// FIFTH MOVEMENT //////////
-
-         myservo2.write(75);  // TURN EYE 1 LEFT
-         myservo3.write(75);  // TURN EYE 2 LEFT
-
-         delay(1000); 
-
-////////////// SIXTH MOVEMENT //////////  
-
-         myservo2.write(105);  // TURN EYE 1 RIGHT
-         myservo3.write(105);  // TURN EYE 2 RIGHT
-
-         delay(1000); 
-       
-      /*  }
-      } else {
-        digitalWrite(ledPin, LOW); // turn LED OFF
-        if (pirState == HIGH){
-          // we have just turned of
-          Serial.println("Motion ended!");
-          // We only want to print on the output change, not state
-          pirState = LOW;
-   
-         delay(3000); 
-         
-         myservo1.write(90);   // CLOSE EYES
-
-         delay(1000);          // Wait 1 second
-
-        }*/
+    //makes downward half circle, so a "U-shape"
+    int re_vertical_increment {55};
+    int le_vertical_decrement {121};
+    for (int i {65}; i <= 120; ++i)
+    {
+      SLE_horizontal.write(i);
+      SRE_horizontal.write(i);
+      SLE_vertical.write(le_vertical_decrement);
+      SRE_vertical.write(re_vertical_increment);
+    
+      //set correct re_vertical increment
+      if(re_vertical_increment < 90 && re_passed == false)
+      {
+        re_vertical_increment += 2;
       }
-   
+      if( re_vertical_increment > 90 )
+      {
+        re_passed = true;
+      }
+      if (re_passed == true )
+      {
+        re_vertical_increment -= 2;
+      }
+  
+      //set correct le_vertical_increment
+      if(le_vertical_decrement > 90 && le_passed == false )
+      {
+        le_vertical_decrement -= 2;
+      }
+      if ( le_vertical_decrement < 90 )
+      {
+       le_passed = true;
+      }
+      if(le_passed == true )
+      {
+        le_vertical_decrement += 2;
+      }
+  
+    delay(100);
+    }
+    re_passed = false;
+    le_passed = false;
+
+    //allign the eyes and eyelids
+    //SEyelids.write(middle);
+    SRE_horizontal.write(middle);
+    SLE_horizontal.write(middle);
+    SRE_vertical.write(middle);
+    SLE_vertical.write(middle);
+    
+  }
+  else
+  {
+    digitalWrite(LEDpin1, LOW);
+    Serial.print("NO MOTION\n");
+  }
+}

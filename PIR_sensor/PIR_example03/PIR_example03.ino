@@ -1,4 +1,4 @@
-int pirSensor = 3;
+int pirSensor = 10;
 int LEDpin = 8;
 
 void setup() {
